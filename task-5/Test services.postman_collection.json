@@ -1,0 +1,54 @@
+{
+	"info": {
+		"_postman_id": "42b271c3-3a3b-4277-94cb-07df631b5469",
+		"name": "Test services",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30026594"
+	},
+	"item": [
+		{
+			"name": "GET_json",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "labs.com/json",
+					"host": [
+						"labs",
+						"com"
+					],
+					"path": [
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST_json",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "lite-server",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "labs.com/",
+					"host": [
+						"labs",
+						"com"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
