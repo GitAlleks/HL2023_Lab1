@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  json-server:
+    image: node
+    container_name: json-server-container
+    volumes:
+      - ./data:/data
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install -g json-server && json-server --watch /data/db.json --port 3000 --host 0.0.0.0"
