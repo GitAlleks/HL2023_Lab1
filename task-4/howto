@@ -1,0 +1,1 @@
+docker-compose up --scale lite-server=3 --scale json-server=3 -d 

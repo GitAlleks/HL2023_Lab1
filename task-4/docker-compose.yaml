@@ -1,0 +1,38 @@
+version: '3.3'
+
+networks:
+  labs:
+    driver: bridge
+
+services:
+  nginx:
+    image: nginx:1.25.2
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./conf.d/:/etc/nginx/conf.d/
+    ports:
+      - "80:80"
+    networks:
+      - labs
+
+  lite-server:
+    image: node:latest
+    volumes:
+      - ./public:/app/public
+    working_dir: /app/public
+    networks:
+      - labs
+    expose:
+      - 3000
+    command: npx lite-server -p 3000
+
+  json-server:
+    image: node:latest
+    volumes:
+      - ./data/:/data/
+    networks:
+      - labs
+    expose:
+      - 3000
+    command: sh -c "npm install -g json-server && json-server --watch /data/db.json --port 3000 --host 0.0.0.0"
