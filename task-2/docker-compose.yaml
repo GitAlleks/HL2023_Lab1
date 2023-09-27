@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  lite-server:
+    image: node
+    container_name: lite-server-container
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./public:/app/public
+    working_dir: /app/public
+    command: npx lite-server -p 3000
