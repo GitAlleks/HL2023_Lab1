@@ -1,0 +1,147 @@
+version: '3.9'
+
+services:
+  mongo-router:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    command: ["mongos", "--port", "27017", "--configdb", "configRS/lab3-mongo-config-1:27017,lab3-mongo-config-2:27017,lab3-mongo-config-3:27017" ,"--bind_ip_all", "--logpath","/var/log/mongodb/mongos.log"]
+    volumes:
+      - mongos-data:/data/db
+      - mongos_config:/data/configdb
+    restart: always
+    expose:
+      - "27017"
+    networks:
+      - mongo-net
+    depends_on:
+      - mongo-config
+
+
+  mongo-config:
+    image: mongo:latest
+    command: ["mongod", "--configsvr", "--replSet", "configRS", "--port", "27017", "--bind_ip", "0.0.0.0"]
+
+    expose:
+      - "27017"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 3
+    networks:
+      - mongo-net
+    
+
+  mongo-data1-s:
+    image: mongo:latest
+    command: ["mongod","--shardsvr" ,"--replSet", "dataRS1","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    volumes:
+      - mongod-data1:/data/db
+    expose:
+      - "27018"
+    restart: always
+    networks:
+      - mongo-net
+  mongo-data2-s:
+    image: mongo:latest
+    command: ["mongod","--shardsvr" ,"--replSet", "dataRS2","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    volumes:
+      - mongod-data2:/data/db
+    expose:
+      - "27018"
+    restart: always
+    networks:
+      - mongo-net    
+  mongo-data3-s:
+    image: mongo:latest
+    command: ["mongod","--shardsvr" ,"--replSet", "dataRS3","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    volumes:
+      - mongod-data3:/data/db
+    expose:
+      - "27018"
+    restart: always
+    networks:
+      - mongo-net
+  mongo-data4-s:
+    image: mongo:latest
+    command: ["mongod","--shardsvr" ,"--replSet", "dataRS4","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    volumes:
+      - mongod-data4:/data/db
+    expose:
+      - "27018"
+    restart: always
+    networks:
+      - mongo-net
+
+
+  mongo-data1-replica:
+    image: mongo:latest
+    command: ["mongod", "--shardsvr","--replSet", "dataRS1","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    # volumes:
+    #   - mongod-data-replica:/data/db
+    expose:
+      - "27018"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+    networks:
+      - mongo-net
+
+  mongo-data2-replica:
+    image: mongo:latest
+    command: ["mongod", "--shardsvr","--replSet", "dataRS2","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    # volumes:
+    #   - mongod-data-replica:/data/db
+    expose:
+      - "27018"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+    networks:
+      - mongo-net
+
+  mongo-data3-replica:
+    image: mongo:latest
+    command: ["mongod", "--shardsvr","--replSet", "dataRS3","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    # volumes:
+    #   - mongod-data-replica:/data/db
+    expose:
+      - "27018"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+    networks:
+      - mongo-net
+  mongo-data4-replica:
+    image: mongo:latest
+    command: ["mongod", "--shardsvr","--replSet", "dataRS4","--port", "27018","--dbpath" ,"/data/db","--bind_ip", "0.0.0.0"]
+    # volumes:
+    #   - mongod-data-replica:/data/db
+    expose:
+      - "27018"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+    networks:
+      - mongo-net
+
+networks:
+  mongo-net:
+    driver: bridge
+
+
+volumes:
+  mongos-data:
+  mongos_config:
+  mongoc:
+  mongoc_config:
+  # mongod-data-replica:
+  mongod-data1:
+  mongod-data2:
+  mongod-data3:
+  mongod-data4:
+

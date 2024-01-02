@@ -1,0 +1,50 @@
+version: '3.3'
+
+networks:
+  mongo-net:
+    driver: bridge
+
+services:
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: passsword 
+    ports:
+    - "27017:27017"
+    networks:
+    - mongo-net
+
+  mongo-config-server:
+    image: mongo:latest
+    command: ["--configsvr", "--replSet", "config-rs"]
+    restart: always
+    deploy:
+      replicas: 2
+    networks:
+    - mongo-net
+
+
+  mongo-data-server:
+    image: mongo:latest
+    command: ["--shardsvr", "--replSet", "shard-rs"]
+    restart: always
+    deploy:
+      replicas: 2
+    networks:
+    - mongo-net
+
+  mongo-data-replica-server:
+    image: mongo:latest
+    command: ["--replica", "--replSet", "shard-rs"]
+    restart: always
+    depends_on:
+      - mongo-data-server
+    # scale: 2
+    deploy:
+      replicas: 2
+    # service: mongo-config-server
+    networks:
+    - mongo-net
+
