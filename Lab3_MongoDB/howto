@@ -1,0 +1,51 @@
+docker-compose up --scale lite-server=3 --scale json-server=3 -d 
+
+
+Sharding options:
+  --configsvr                           Declare this is a config db of a 
+                                        cluster; default port 27019; default 
+                                        dir /data/configdb
+  --shardsvr                            Declare this is a shard db of a 
+                                        cluster; default port 27018
+
+
+
+
+
+apt install net-tools
+apt install iputils-ping
+
+
+mongosh --host localhost:27017
+mongosh --host lab3-mongo-config-1:27017
+
+rs.initiate({_id:'dataRS',members:[{ _id: 0, host: 'lab3-mongo-data-1:27018'},{_id:1, host:'lab3-mongo-data-replica-1:27018'}]})
+
+
+rs.initiate({_id:'dataRS',members:[{ _id: 0, host: 'lab3-mongo-data-1:27018', priority: 2},{_id:1, host:'lab3-mongo-data-replica-1:27018', priority: 1 }]})
+
+
+
+
+direct: mongos] test> sh.addShard("dataRS/lab3-mongo-data-replica-1:27018,lab3-mongo-data-1:27018")
+
+
+rs.initiate({_id: "configRS", configsvr:true, members:[ {_id:0, host:"lab3-mongo-config-1:27017"}]})
+
+
+root@996ec4becbd9:/# cat etc/mongos.conf 
+configdb=lab3-mongo-config-1:27017
+
+
+# environment:
+    #   MONGOS_URI: "mongodb://config-srv-1:27017,config-srv-2:27017,config-srv-3:27017/?replicaSet=config-rs"
+#"--configdb", "configRS/lab3-mongo-config-1:27017"
+
+
+
+
+# volumes:
+#   - mongoc:/data/db
+#   - mongoc_config:/data/configdb
+
+"--configdb", "configRS/lab3-mongo-config-1:27017,lab3-mongo-config-2:27017,lab3-mongo-config-3:27017" 

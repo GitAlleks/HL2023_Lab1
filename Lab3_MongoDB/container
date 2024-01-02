@@ -1,0 +1,17 @@
+CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                    PORTS                      NAMES
+adac6279171b   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              0.0.0.0:27017->27017/tcp   lab3-mongo-router-1
+7f60c0619dea   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data1-replica-1
+6d0928fc44dd   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data2-s-1
+019a05668747   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data1-replica-2
+680fc9cf9fc7   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data2-replica-1
+ea97d4d7f804   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017/tcp                  lab3-mongo-config-3
+ef86dcafe6ea   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data4-replica-1
+f2b32f31afc5   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data4-replica-2
+5eeea2cdb80b   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data2-replica-2
+eeba6db8e6fc   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data3-s-1
+98184c915521   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017/tcp                  lab3-mongo-config-2
+66873e30cacf   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data4-s-1
+89c3b4a268ee   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017/tcp                  lab3-mongo-config-1
+eb197fc1b4f9   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data1-s-1
+57c25e9f5af6   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data3-replica-2
+cc9420ea4284   mongo:latest   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes              27017-27018/tcp            lab3-mongo-data3-replica-1

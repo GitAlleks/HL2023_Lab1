@@ -1,0 +1,122 @@
+
+//docker exec -it lab3-mongo-config-1 mongosh --host localhost:27017
+rs.initiate(
+    {
+        _id: "configRS",
+        configsvr:true, 
+        members:[
+            {_id:0, host:"lab3-mongo-config-1:27017"},
+            {_id:1, host:"lab3-mongo-config-2:27017"},
+            {_id:3, host:"lab3-mongo-config-3:27017"}
+        ]
+    }
+)
+
+//docker exec -it lab3-mongo-data1-s-1 mongosh --host localhost:27018
+rs.initiate(
+    {
+      _id: "dataRS1",
+      members: [
+        { _id : 0, host : "lab3-mongo-data1-s-1:27018" , priority: 5},
+        { _id : 1, host : "lab3-mongo-data1-replica-1:27018", priority: 2},
+        { _id : 2, host : "lab3-mongo-data1-replica-2:27018", priority: 2}
+      ]
+    }
+)
+
+
+//docker exec -it lab3-mongo-data2-s-1 mongosh --host localhost:27018
+rs.initiate(
+    {
+      _id: "dataRS2",
+      members: [
+        { _id : 0, host : "lab3-mongo-data2-s-1:27018", priority: 5},
+        { _id : 1, host : "lab3-mongo-data2-replica-1:27018", priority: 2},
+        { _id : 2, host : "lab3-mongo-data2-replica-2:27018" , priority: 2}
+      ]
+    }
+)
+
+
+//docker exec -it lab3-mongo-data3-s-1 mongosh --host localhost:27018
+rs.initiate(
+    {
+      _id: "dataRS3",
+      members: [
+        { _id : 0, host : "lab3-mongo-data3-s-1:27018", priority: 5 },
+        { _id : 1, host : "lab3-mongo-data3-replica-1:27018", priority: 2 },
+        { _id : 2, host : "lab3-mongo-data3-replica-2:27018", priority: 2 }
+      ]
+    }
+)
+
+
+//docker exec -it lab3-mongo-data4-s-1 mongosh --host localhost:27018
+rs.initiate(
+    {
+      _id: "dataRS4",
+      members: [
+        { _id : 0, host : "lab3-mongo-data4-s-1:27018", priority: 5 },
+        { _id : 1, host : "lab3-mongo-data4-replica-1:27018", priority: 2 },
+        { _id : 2, host : "lab3-mongo-data4-replica-2:27018", priority: 2 }
+      ]
+    }
+)
+
+
+
+//mongosh --host localhost:27017
+sh.addShard("dataRS1/lab3-mongo-data1-s-1:27018,lab3-mongo-data1-replica-1:27018,lab3-mongo-data1-replica-1:27018")
+sh.addShard("dataRS2/lab3-mongo-data2-s-1:27018,lab3-mongo-data2-replica-1:27018,lab3-mongo-data2-replica-1:27018")
+sh.addShard("dataRS3/lab3-mongo-data3-s-1:27018,lab3-mongo-data3-replica-1:27018,lab3-mongo-data3-replica-1:27018")
+sh.addShard("dataRS4/lab3-mongo-data4-s-1:27018,lab3-mongo-data4-replica-1:27018,lab3-mongo-data4-replica-1:27018")
+
+
+db.createCollection("myShardedCollection", { shardKey: { key: 1 } })
+sh.status({ verbose: 1, key: { yourShardKeyField: 1 } })
+db.myShardedCollection.find().explain("executionStats")
+
+
+
+use testdb
+db.createCollection("myShardedCollection")
+sh.shardCollection("testdb.myShardedCollection", { field: "hashed" })
+
+
+db.myShardedCollection.insertMany([
+    {field: "value1", otherfield: "othervalue1"},
+    {field: "value2", otherfield: "othervalue2"},
+    {field: "value3", otherfield: "othervalue3"}
+])
+
+db.myShardedCollection.insertMany([
+    {field: "value5", otherfield: "othervalue1"},
+    {field: "value7", otherfield: "othervalue2"}
+])
+
+
+db.myShardedCollection.find().readPref("secondary")
+
+
+
+//use london
+db.createCollection("test")
+
+
+//mongoimport --host=localhost --port=27017 --db=london --collection=test --type=csv --headerline --ignoreBlanks --file=./london_postcodes-ons-postcodes-directory-feb22.csv
+
+
+mongoimport --host=localhost --port=27017 --db=london --collection=postcodes --type=csv --headerline --ignoreBlanks --file=./London_postcodes.csv
+// 2024-01-02T12:57:10.784+0200    connected to: mongodb://localhost:27017/
+// 2024-01-02T12:57:13.780+0200    [#####...................] london.london_postcodes      18.9MB/84.4MB (22.4%)
+// 2024-01-02T12:57:16.777+0200    [##########..............] london.london_postcodes      36.5MB/84.4MB (43.3%)
+// 2024-01-02T12:57:19.774+0200    [###############.........] london.london_postcodes      56.2MB/84.4MB (66.6%)
+// 2024-01-02T12:57:22.771+0200    [#####################...] london.london_postcodes      76.3MB/84.4MB (90.5%)
+// 2024-01-02T12:57:24.313+0200    [########################] london.london_postcodes      84.4MB/84.4MB (100.0%)
+// 2024-01-02T12:57:24.313+0200    314746 document(s) imported successfully. 0 document(s) failed to import.
+
+
+mongoimport --host=localhost --port=27017 --db=london --collection=rides --type=csv --headerline --ignoreBlanks --file=./taxi.csv
+
+
+mongosh --port 27017 --eval "sh.enableSharding('london'); sh.shardCollection('london.postcodes', {_id:'hashed'})"
