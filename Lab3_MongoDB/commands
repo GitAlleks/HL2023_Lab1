@@ -68,35 +68,35 @@ db.myShardedCollection.find().explain("executionStats")
 
 
 
-use testdb
-db.createCollection("myShardedCollection")
-sh.shardCollection("testdb.myShardedCollection", { field: "hashed" })
+// use testdb
+// db.createCollection("myShardedCollection")
+// sh.shardCollection("testdb.myShardedCollection", { field: "hashed" })
 
 
-db.myShardedCollection.insertMany([
-  { field: "value1", otherfield: "othervalue1" },
-  { field: "value2", otherfield: "othervalue2" },
-  { field: "value3", otherfield: "othervalue3" }
-])
+// db.myShardedCollection.insertMany([
+//   { field: "value1", otherfield: "othervalue1" },
+//   { field: "value2", otherfield: "othervalue2" },
+//   { field: "value3", otherfield: "othervalue3" }
+// ])
 
-db.myShardedCollection.insertMany([
-  { field: "value5", otherfield: "othervalue1" },
-  { field: "value7", otherfield: "othervalue2" }
-])
-
-
-db.myShardedCollection.find().readPref("secondary")
+// db.myShardedCollection.insertMany([
+//   { field: "value5", otherfield: "othervalue1" },
+//   { field: "value7", otherfield: "othervalue2" }
+// ])
 
 
+// db.myShardedCollection.find().readPref("secondary")
 
-//use london
-db.createCollection("test")
+
+
+// //use london
+// db.createCollection("test")
 
 
 //mongoimport --host=localhost --port=27017 --db=london --collection=test --type=csv --headerline --ignoreBlanks --file=./london_postcodes-ons-postcodes-directory-feb22.csv
 
 
-mongoimport --host=localhost --port=27017 --db=london --collection = postcodes--type = csv --headerline --ignoreBlanks --file =./London_postcodes.csv
+// mongoimport --host=localhost --port=27017 --db=london --collection = postcodes--type = csv --headerline --ignoreBlanks --file =./London_postcodes.csv
 // 2024-01-02T12:57:10.784+0200    connected to: mongodb://localhost:27017/
 // 2024-01-02T12:57:13.780+0200    [#####...................] london.london_postcodes      18.9MB/84.4MB (22.4%)
 // 2024-01-02T12:57:16.777+0200    [##########..............] london.london_postcodes      36.5MB/84.4MB (43.3%)
@@ -106,52 +106,20 @@ mongoimport --host=localhost --port=27017 --db=london --collection = postcodes--
 // 2024-01-02T12:57:24.313+0200    314746 document(s) imported successfully. 0 document(s) failed to import.
 
 
-mongoimport --host=localhost --port=27017 --db=london --collection=rides --type=csv --headerline --ignoreBlanks --file=./taxi.csv
+// mongoimport --host=localhost --port=27017 --db=london --collection=rides --type=csv --headerline --ignoreBlanks --file=./taxi.csv
 
 
-mongosh--port 27017 --eval "sh.enableSharding('london'); sh.shardCollection('london.postcodes', {_id:'hashed'})"
+// mongosh--port 27017 --eval "sh.enableSharding('london'); sh.shardCollection('london.postcodes', {_id:'hashed'})"
 
 
-db.rides.aggregate([
-  {
-    $match: {
-      driver_rate: { $lt: 3.5 }
-    }
-  },
-  {
-    $group: {
-      _id: "$driver_id",
-      average_rating: { $avg: "$driver_rate" },
-      trips: {
-        $push: {
-          client_id: "$client_id",
-          start_point: "$start_point",
-          end_point: "$end_point",
-          distance: "$distance",
-          start_time: "$start_time",
-          end_time: "$end_time",
-          road_time: "$road_time",
-          cost: "$cost",
-          driver_rate: "$driver_rate",
-          client_rate: "$client_rate",
-          category_driver_feedback: "$category_driver_feedback",
-          text_driver_feedback: "$text_driver_feedback",
-          category_client_feedback: "$category_client_feedback",
-          text_client_feedback: "$text_client_feedback"
-        }
-      }
-    }
-  },
-  {
-    $match: { average_rating: { $lt: 3.5 } }
-  },
-  {
-    $project: {
-      _id: 0,
-      driver_id: "$_id",
-      trips: 1
-    }
-  }
-])
+db.rides.aggregate([{$group: {_id: "$driver_id",average_rating: { $avg: "$driver_rate" },trips: { $push: "$trip_id" }} }, { $match: { average_rating: { $lt: 3.5 } } }, { $project: { _id: 0, driver_id: "$_id", trips: 1 } }, { $out: "result_collection" } ]);
 
-mongoexport --host=localhost --port=27017 --db london --collection rides --out output_data.json --jsonArray --query 'db.rides.aggregate([{$match: {driver_rate: { $lt: 3.5 }}},{$group: {_id: "$driver_id",average_rating: { $avg: "$driver_rate" },trips: {$push: {client_id: "$client_id", start_point: "$start_point", end_point: "$end_point", distance: "$distance", start_time: "$start_time", end_time: "$end_time", road_time: "$road_time", cost: "$cost", driver_rate: "$driver_rate", client_rate: "$client_rate", category_driver_feedback: "$category_driver_feedback", text_driver_feedback: "$text_driver_feedback", category_client_feedback: "$category_client_feedback", text_client_feedback: "$text_client_feedback" } } } }, { $match: { average_rating: { $lt: 3.5 } } }, { $project: { _id: 0, driver_id: "$_id", trips: 1 } } ]);'
+db.rides_2.aggregate([{ $group: {_id: "$driver_id",average_rating: { $avg: "$driver_rate" },trips: { $push: "$trip_id" }} },{ $match: { average_rating: { $lt: 3.5 } } },{ $project: {_id: 0,driver_id: "$_id",trips: 1,avg_driver_rate: "$average_rating"} },{ $out: "result_collection" }]);
+
+
+
+// old
+// db.rides.aggregate([{$group: {_id: "$driver_id",average_rating: { $avg: "$driver_rate" },trips: {$push: {client_id: "$client_id", start_point: "$start_point", end_point: "$end_point", distance: "$distance", start_time: "$start_time", end_time: "$end_time", road_time: "$road_time", cost: "$cost", driver_rate: "$driver_rate", client_rate: "$client_rate", category_driver_feedback: "$category_driver_feedback", text_driver_feedback: "$text_driver_feedback", category_client_feedback: "$category_client_feedback", text_client_feedback: "$text_client_feedback" } } } }, { $match: { average_rating: { $lt: 3.5 } } }, { $project: { _id: 0, driver_id: "$_id", trips: 1 } }, { $out: "result_collection" } ]);
+
+
+// mongoexport mongodb://localhost:27017/london --collection result_collection --out output_data.json
