@@ -1,0 +1,17 @@
+docker build -t hadoop-java8 .
+
+docker run -it hadoop-java8
+
+docker cp ../sample.txt focused_kilby:/hadoop_lab
+
+
+mkdir units 
+javac -classpath hadoop-core-1.2.1.jar -d units ProcessUnits.java 
+jar -cvf units.jar -C units/ . 
+$HADOOP_HOME/bin/hadoop fs -mkdir input_dir 
+$HADOOP_HOME/bin/hadoop fs -put /home/hadoop/sample.txt input_dir 
+$HADOOP_HOME/bin/hadoop fs -ls input_dir/ 
+$HADOOP_HOME/bin/hadoop jar units.jar hadoop.ProcessUnits input_dir output_dir 
+$HADOOP_HOME/bin/hadoop fs -ls output_dir/ 
+$HADOOP_HOME/bin/hadoop fs -cat output_dir/part-00000 
+$HADOOP_HOME/bin/hadoop fs -get output_dir/part-00000
